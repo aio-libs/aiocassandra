@@ -12,7 +12,6 @@ addons:
       - python3.5
       - python3.6
       - pypy
-      - pypy3
 env:
   - TOXENV=py27
   - TOXENV=py35
