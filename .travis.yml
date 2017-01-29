@@ -1,0 +1,29 @@
+language: python
+sudo: false
+services:
+  - cassandra
+addons:
+  apt:
+    packages:
+      - python2.6
+      - python2.7
+      - python3.0
+      - python3.1
+      - python3.2
+      - python3.3
+      - python3.4
+      - python3.5
+      - python3.6
+      - pypy
+      - pypy3
+env:
+  - TOXENV=py27
+  - TOXENV=py35
+cache:
+  directories:
+    pip: true
+install:
+  - virtualenv -p python /tmp/env
+  - /tmp/env/bin/pip install tox
+script:
+  - /tmp/env/bin/tox
