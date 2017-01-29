@@ -4,6 +4,8 @@ services:
   - cassandra
 addons:
   apt:
+    sources:
+      - deadsnakes
     packages:
       - python2.7
       - python3.2
@@ -11,7 +13,6 @@ addons:
       - python3.4
       - python3.5
       - python3.6
-      - pypy
 env:
   - TOXENV=py27
   - TOXENV=py35
