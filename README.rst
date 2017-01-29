@@ -20,6 +20,7 @@ Usage
 -----
 
 .. code-block:: python
+
     import asyncio
 
     from aiocassandra import aiosession
@@ -47,4 +48,4 @@ Usage
         loop.close()
 
 
-Python 2.7(trollius), 3.3+ and PyPy are supported.
+Python 2.7(trollius), 3.2+ and PyPy are supported.
