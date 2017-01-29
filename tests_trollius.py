@@ -38,11 +38,11 @@ class AiosessionTestCase(unittest.TestCase):
 
     @trollius.coroutine
     def test_execute_future_prepare(self):
-        session = aiosession(self.session)
+        aiosession(self.session)
 
-        now_cql = session.prepare('SELECT now() FROM system.local;')
+        now_cql = self.session.prepare('SELECT now() FROM system.local;')
 
-        ret = yield From(session.execute_future(now_cql))
+        ret = yield From(self.session.execute_future(now_cql))
 
         self.assertEqual(len(ret), 1)
 
@@ -50,11 +50,11 @@ class AiosessionTestCase(unittest.TestCase):
 
     @trollius.coroutine
     def test_execute_future(self):
-        session = aiosession(self.session)
+        aiosession(self.session)
 
         now_cql = 'SELECT now() FROM system.local;'
 
-        ret = yield From(session.execute_future(now_cql))
+        ret = yield From(self.session.execute_future(now_cql))
 
         self.assertEqual(len(ret), 1)
 

@@ -37,11 +37,11 @@ class AiosessionTestCase(unittest.TestCase):
 
     @asyncio.coroutine
     def test_execute_future_prepare(self):
-        session = aiosession(self.session)
+        aiosession(self.session)
 
         now_cql = session.prepare('SELECT now() FROM system.local;')
 
-        ret = yield from session.execute_future(now_cql)
+        ret = yield from self.session.execute_future(now_cql)
 
         self.assertEqual(len(ret), 1)
 
@@ -49,11 +49,11 @@ class AiosessionTestCase(unittest.TestCase):
 
     @asyncio.coroutine
     def test_execute_future(self):
-        session = aiosession(self.session)
+        aiosession(self.session)
 
         now_cql = 'SELECT now() FROM system.local;'
 
-        ret = yield from session.execute_future(now_cql)
+        ret = yield from self.session.execute_future(now_cql)
 
         self.assertEqual(len(ret), 1)
 
