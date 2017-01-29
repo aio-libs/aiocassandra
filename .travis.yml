@@ -20,7 +20,7 @@ cache:
   directories:
     pip: true
 install:
-  - virtualenv -p python /tmp/env
+  - virtualenv -p python3.5 /tmp/env
   - /tmp/env/bin/pip install tox
 script:
   - /tmp/env/bin/tox
