@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import unittest
 import uuid
 from functools import wraps

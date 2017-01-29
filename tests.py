@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import os
 import unittest
@@ -67,4 +68,5 @@ class AiocassandraTestCase(AiosessionTestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    suite = unittest.TestLoader().loadTestsFromTestCase(AiocassandraTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)
