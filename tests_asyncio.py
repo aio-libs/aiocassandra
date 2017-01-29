@@ -29,37 +29,26 @@ class AiosessionTestCase(unittest.TestCase):
         self.cluster = Cluster()
         self.session = self.cluster.connect()
 
-    @asyncio.coroutine
-    def test_session(self):
-        session = aiosession(self.session)
+        aiosession(self.session, loop=self.loop)
 
-        self.assertIsNotNone(getattr(session, 'execute_future', None))
-
+    @run_loop
     @asyncio.coroutine
     def test_execute_future_prepare(self):
-        aiosession(self.session)
+        cql = self.session.prepare('SELECT now() as now FROM system.local;')
 
-        now_cql = session.prepare('SELECT now() FROM system.local;')
-
-        ret = yield from self.session.execute_future(now_cql)
+        ret = yield from self.session.execute_future(cql)
 
         self.assertEqual(len(ret), 1)
 
-        self.assertIsInstance(ret[0].system_now, uuid.UUID)
+        self.assertIsInstance(ret[0].now, uuid.UUID)
 
+    @run_loop
     @asyncio.coroutine
     def test_execute_future(self):
-        aiosession(self.session)
+        cql = 'SELECT now() as now FROM system.local;'
 
-        now_cql = 'SELECT now() FROM system.local;'
-
-        ret = yield from self.session.execute_future(now_cql)
+        ret = yield from self.session.execute_future(cql)
 
         self.assertEqual(len(ret), 1)
 
-        self.assertIsInstance(ret[0].system_now, uuid.UUID)
-
-    def tearDown(self):
-        self.cluster.shutdown()
-        self.loop.call_soon(self.loop.stop)
-        self.loop.close()
+        self.assertIsInstance(ret[0].now, uuid.UUID)

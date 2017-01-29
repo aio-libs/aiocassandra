@@ -11,7 +11,7 @@ from cassandra.cluster import Session
 from types import MethodType  # isort:skip
 
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 
 def _asyncio_fut_factory(loop):
@@ -43,7 +43,10 @@ def execute_future(self, *args, **kwargs):
 
 
 def aiosession(session, loop=None):
-    assert isinstance(session, Session)
+    assert isinstance(session, Session), 'provide cassandra.cluster.Session'
+
+    if hasattr(session, '_asyncio_fut_factory'):
+        raise RuntimeError('session is already patched by aiosession')
 
     if loop is None:
         loop = asyncio.get_event_loop()
