@@ -20,6 +20,10 @@ cache:
   directories:
     pip: true
 install:
+  - pip install -U pip
+  - pip install -U wheel
+  - pip install -U setuptools
+  - pip install -U virtualenv
   - virtualenv -p python3.5 /tmp/env
   - /tmp/env/bin/pip install tox
 script:
