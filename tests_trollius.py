@@ -29,32 +29,25 @@ class AiosessionTestCase(unittest.TestCase):
         self.loop = trollius.new_event_loop()
         self.cluster = Cluster()
         self.session = self.cluster.connect()
+        aiosession(self.session, loop=self.loop)
 
-    @trollius.coroutine
-    def test_session(self):
-        session = aiosession(self.session)
-
-        self.assertIsNotNone(getattr(session, 'execute_future', None))
-
+    @run_loop
     @trollius.coroutine
     def test_execute_future_prepare(self):
-        aiosession(self.session)
+        cql = self.session.prepare('SELECT now() FROM system.local;')
 
-        now_cql = self.session.prepare('SELECT now() FROM system.local;')
-
-        ret = yield From(self.session.execute_future(now_cql))
+        ret = yield From(self.session.execute_future(cql))
 
         self.assertEqual(len(ret), 1)
 
         self.assertIsInstance(ret[0].system_now, uuid.UUID)
 
+    @run_loop
     @trollius.coroutine
     def test_execute_future(self):
-        aiosession(self.session)
+        cql = 'SELECT now() FROM system.local;'
 
-        now_cql = 'SELECT now() FROM system.local;'
-
-        ret = yield From(self.session.execute_future(now_cql))
+        ret = yield From(self.session.execute_future(cql))
 
         self.assertEqual(len(ret), 1)
 
