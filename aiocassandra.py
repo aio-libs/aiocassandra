@@ -11,7 +11,7 @@ from cassandra.cluster import Session
 from types import MethodType  # isort:skip
 
 
-__version__ = '0.0.1'
+__version__ = '1.0.0'
 
 
 def _asyncio_fut_factory(loop):
