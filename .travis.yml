@@ -18,9 +18,6 @@ env:
   - TOXENV=py34
   - TOXENV=py35
   - TOXENV=pypy
-cache:
-  directories:
-    pip: true
 install:
   - pip install -U pip wheel setuptools virtualenv
   - virtualenv /tmp/env
