@@ -53,6 +53,7 @@ class AiocassandraTestCase(AiosessionTestCase):
         finally:
             cluster.shutdown()
             loop.call_soon(loop.stop)
+            loop.run_forever()
             loop.close()
 
     def test_explicit_loop(self):
@@ -64,6 +65,7 @@ class AiocassandraTestCase(AiosessionTestCase):
     def tearDown(self):
         self.cluster.shutdown()
         self.loop.call_soon(self.loop.stop)
+        self.loop.run_forever()
         self.loop.close()
 
 
