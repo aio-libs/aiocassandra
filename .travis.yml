@@ -11,10 +11,7 @@ python:
 services:
   - cassandra
 install:
-  - pip install -U setuptools
-  - pip install -U pip
-  - pip install -U wheel
-  - pip install -U Cython
+  - pip install -U setuptools pip wheel Cython
   - pip install -U virtualenv
 
   - virtualenv $HOME/env
