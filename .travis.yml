@@ -11,13 +11,7 @@ python:
 services:
   - cassandra
 env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
-  - TOXENV=py36
-  - TOXENV=pypy
+  - TOXENV=`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
 install:
   - pip install -U pip wheel setuptools virtualenv
   - virtualenv /tmp/env
