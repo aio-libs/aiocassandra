@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-try:
-    import asyncio
-except ImportError:
-    import trollius as asyncio
+from __future__ import unicode_literals
+
 import sys
 from functools import partial
 
@@ -10,8 +8,12 @@ from cassandra.cluster import Session
 
 from types import MethodType  # isort:skip
 
+try:
+    import asyncio
+except ImportError:
+    import trollius as asyncio
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 
 def _asyncio_fut_factory(loop):

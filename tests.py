@@ -1,7 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import sys
 import os
-import unittest
+
+import unittest2
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'
 
@@ -70,5 +74,5 @@ class AiocassandraTestCase(AiosessionTestCase):
 
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(AiocassandraTestCase)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    suite = unittest2.TestLoader().loadTestsFromTestCase(AiocassandraTestCase)
+    unittest2.TextTestRunner(verbosity=2).run(suite)

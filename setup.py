@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import io
 import re
 
@@ -10,19 +12,14 @@ except ImportError:
 
 def get_version():
     regex = r"""__version__\s+=\s+(?P<quote>['"])(?P<version>.+?)(?P=quote)"""
-    fp = io.open('aiocassandra.py', mode='rt', encoding='utf-8')
-    try:
+
+    with io.open('aiocassandra.py', mode='rt', encoding='utf-8') as fp:
         return re.search(regex, fp.read()).group('version')
-    finally:
-        fp.close()
 
 
 def get_long_description():
-    fp = io.open('README.rst', mode='rt', encoding='utf-8')
-    try:
+    with io.open('README.rst', mode='rt', encoding='utf-8') as fp:
         return fp.read()
-    finally:
-        fp.close()
 
 
 setup(
@@ -38,7 +35,7 @@ setup(
         ':python_version=="3.3"': ['asyncio'],
         ':python_version<="3.2"': ['trollius'],
     },
-    py_modules=['aiocassandra'],
+    py_modules=[str('aiocassandra')],
     zip_safe=False,
     platforms='any',
     classifiers=[

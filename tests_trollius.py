@@ -1,8 +1,11 @@
-import unittest
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import uuid
 from functools import wraps
 
 import trollius
+import unittest2
 from aiocassandra import aiosession
 from cassandra.cluster import Cluster
 from trollius import From
@@ -22,7 +25,7 @@ def run_loop(fn):
     return wrapped
 
 
-class AiosessionTestCase(unittest.TestCase):
+class AiosessionTestCase(unittest2.TestCase):
     def setUp(self):
         trollius.set_event_loop(None)
         self.loop = trollius.new_event_loop()
