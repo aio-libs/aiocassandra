@@ -1,17 +1,16 @@
 language: python
 python:
-  - python2.6
-  - python2.7
-  - python3.3
-  - python3.4
-  - python3.5
-  - python3.6
-  - nightly
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
   - pypy
 services:
   - cassandra
 env:
-  - TOXENV=`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
+  - TOXENV=`pypy -c 'import sys; print("pypy" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
 install:
   - pip install -U pip wheel setuptools virtualenv
   - virtualenv /tmp/env
