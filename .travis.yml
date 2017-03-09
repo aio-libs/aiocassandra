@@ -10,18 +10,12 @@ python:
   - pypy
 services:
   - cassandra
-install:
-  - pip install -U setuptools pip wheel Cython
-  - pip install -U virtualenv
-
-  - virtualenv $HOME/env
-  - $HOME/env/bin/pip install tox
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
   - python --version
 
-  - $HOME/env/bin/tox
+  - tox
 cache:
   directories:
     - $HOME/.cache/pip
