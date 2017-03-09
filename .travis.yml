@@ -19,3 +19,8 @@ script:
   - python --version
 
   - /tmp/env/bin/tox
+cache:
+  directories:
+    - $HOME/.cache/pip
+notifications:
+  email: false
