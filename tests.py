@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import sys
 import os
+import sys
 
-import unittest2
+from cassandra.cluster import Cluster
 
-os.environ['PYTHONASYNCIODEBUG'] = '1'
+from aiocassandra import aiosession
+
+os.environ['PYTHONASYNCIODEBUG'] = '1'  # noqa
+
 
 if sys.version_info >= (3, 3):
     import asyncio
@@ -16,9 +19,10 @@ else:
     import trollius as asyncio
     from tests_trollius import AiosessionTestCase
 
-from cassandra.cluster import Cluster
-
-from aiocassandra import aiosession
+try:
+    import unittest2 as unittest
+except ImportError:
+    pass
 
 
 class AiocassandraTestCase(AiosessionTestCase):
@@ -74,5 +78,5 @@ class AiocassandraTestCase(AiosessionTestCase):
 
 
 if __name__ == '__main__':
-    suite = unittest2.TestLoader().loadTestsFromTestCase(AiocassandraTestCase)
-    unittest2.TextTestRunner(verbosity=2).run(suite)
+    suite = unittest.TestLoader().loadTestsFromTestCase(AiocassandraTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)

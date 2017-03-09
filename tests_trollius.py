@@ -4,11 +4,16 @@ from __future__ import unicode_literals
 import uuid
 from functools import wraps
 
-import trollius
-import unittest2
-from aiocassandra import aiosession
 from cassandra.cluster import Cluster
+
+import trollius
+from aiocassandra import aiosession
 from trollius import From
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    pass
 
 
 def run_loop(fn):
@@ -25,7 +30,7 @@ def run_loop(fn):
     return wrapped
 
 
-class AiosessionTestCase(unittest2.TestCase):
+class AiosessionTestCase(unittest.TestCase):
     def setUp(self):
         trollius.set_event_loop(None)
         self.loop = trollius.new_event_loop()
