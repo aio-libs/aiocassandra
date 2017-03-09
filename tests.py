@@ -22,7 +22,7 @@ else:
 try:
     import unittest2 as unittest
 except ImportError:
-    pass
+    import unittest
 
 
 class AiocassandraTestCase(AiosessionTestCase):

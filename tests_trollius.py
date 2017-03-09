@@ -13,7 +13,7 @@ from trollius import From
 try:
     import unittest2 as unittest
 except ImportError:
-    pass
+    import unittest
 
 
 def run_loop(fn):
