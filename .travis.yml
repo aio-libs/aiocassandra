@@ -9,7 +9,8 @@ python:
   - pypy
 services:
   - cassandra
-install:  - pip install -U pip wheel setuptools virtualenv
+install:
+  - pip install -U pip wheel setuptools virtualenv
   - virtualenv /tmp/env
   - /tmp/env/bin/pip install tox
 script:
