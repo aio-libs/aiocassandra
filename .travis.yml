@@ -19,9 +19,8 @@ script:
   - python --version
 
   - $HOME/env/bin/tox
-before_cache:
-  - rm -f $HOME/.cache/pip/log/debug.log
 cache:
+  apt: true
   directories:
     - $HOME/.cache/pip
 notifications:
