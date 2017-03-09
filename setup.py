@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 import io
-import re
 import os
+import re
 
 try:
     from setuptools import setup
