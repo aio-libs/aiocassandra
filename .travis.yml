@@ -14,7 +14,7 @@ install:
   - virtualenv /tmp/env
   - /tmp/env/bin/pip install tox
 script:
-  - export TOXENV=`python -c 'import sys; print("pypy" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
+  - export TOXENV=py`python -c 'import sys; print("pypy" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
   - python --version
 
