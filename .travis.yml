@@ -11,14 +11,16 @@ services:
   - cassandra
 install:
   - pip install -U pip wheel setuptools virtualenv
-  - virtualenv /tmp/env
-  - /tmp/env/bin/pip install tox
+  - virtualenv $HOME/env
+  - $HOME/env/bin/pip install tox
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
   - python --version
 
-  - /tmp/env/bin/tox
+  - $HOME/env/bin/tox
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
 cache:
   directories:
     - $HOME/.cache/pip
