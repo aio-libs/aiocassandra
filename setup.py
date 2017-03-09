@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import io
 import re
+import os
 
 try:
     from setuptools import setup
@@ -11,14 +12,15 @@ except ImportError:
 
 
 def get_version():
-    regex = r"""__version__\s+=\s+(?P<quote>['"])(?P<version>.+?)(?P=quote)"""
+    regex = r"__version__\s=\s\'(?P<version>[\d\.]+?)\'"
 
-    with io.open('aiocassandra.py', mode='rt', encoding='utf-8') as fp:
-        return re.search(regex, fp.read()).group('version')
+    return re.search(regex, read('aiocassandra.py')).group('version')
 
 
-def get_long_description():
-    with io.open('README.rst', mode='rt', encoding='utf-8') as fp:
+def read(*parts):
+    filename = os.path.join(os.path.abspath(os.path.dirname(__file__)), *parts)
+
+    with io.open(filename, encoding='utf-8', mode='rt') as fp:
         return fp.read()
 
 
@@ -29,7 +31,7 @@ setup(
     author_email='osf@wikibusiness.org',
     url='https://github.com/wikibusiness/aiocassandra',
     description='Simple threaded cassandra wrapper for asyncio',
-    long_description=get_long_description(),
+    long_description=read('README.rst'),
     install_requires=['cassandra-driver'],
     extras_require={
         ':python_version=="3.3"': ['asyncio'],
