@@ -37,7 +37,7 @@ setup(
     install_requires=['cassandra-driver'],
     extras_require={
         ':python_version=="3.3"': ['asyncio'],
-        ':python_version<="3.2"': ['trollius'],
+        ':python_version=="2.7"': ['trollius'],
     },
     py_modules=[str('aiocassandra')],
     zip_safe=False,

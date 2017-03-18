@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import os  # noqa # isort:skip
 import sys  # noqa # isort:skip
+import unittest  # noqa # isort:skip
 
 os.environ['PYTHONASYNCIODEBUG'] = '1'  # noqa # isort:skip
 
@@ -17,11 +18,6 @@ if sys.version_info >= (3, 3):
 else:
     import trollius as asyncio
     from tests_trollius import AiosessionTestCase
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 
 
 class AiocassandraTestCase(AiosessionTestCase):
