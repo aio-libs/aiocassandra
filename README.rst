@@ -36,7 +36,7 @@ Usage
     def main(*, loop):
         # patches and adds `execute_future` to `cassandra.cluster.Session`
         aiosession(session, loop=loop)
-        return (yield from session.execute_future(cql))
+        return (yield session.execute_future(cql))
 
     loop = asyncio.get_event_loop()
 
@@ -47,5 +47,4 @@ Usage
         cluster.shutdown()
         loop.close()
 
-
-Python 2.7(trollius), 3.3+ and PyPy are supported.
+Python 2.7(trollius), 3.3+ and PyPy(trollius) are supported
