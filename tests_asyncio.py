@@ -1,11 +1,10 @@
-import asyncio
+import asyncio  # isort:skip
 import unittest
 import uuid
 from functools import wraps
 
-from cassandra.cluster import Cluster
-
 from aiocassandra import aiosession
+from cassandra.cluster import Cluster
 
 
 def run_loop(fn):
@@ -26,6 +25,7 @@ class AiosessionTestCase(unittest.TestCase):
     def setUp(self):
         asyncio.set_event_loop(None)
         self.loop = asyncio.new_event_loop()
+        self.loop.set_debug(True)
         self.cluster = Cluster()
         self.session = self.cluster.connect()
 

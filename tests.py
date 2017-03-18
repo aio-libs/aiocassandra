@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import os
-import sys
+import os  # noqa # isort:skip
+import sys  # noqa # isort:skip
 
-from cassandra.cluster import Cluster
+os.environ['PYTHONASYNCIODEBUG'] = '1'  # noqa # isort:skip
 
-from aiocassandra import aiosession
-
-os.environ['PYTHONASYNCIODEBUG'] = '1'  # noqa
+from aiocassandra import aiosession  # noqa # isort:skip
+from cassandra.cluster import Cluster   # noqa # isort:skip
 
 
 if sys.version_info >= (3, 3):
@@ -48,11 +47,10 @@ class AiocassandraTestCase(AiosessionTestCase):
     def test_main_thread_loop(self):
         try:
             loop = asyncio.new_event_loop()
-
+            loop.set_debug(True)
             asyncio.set_event_loop(loop)
 
             cluster = Cluster()
-
             session = cluster.connect()
 
             aiosession(session)

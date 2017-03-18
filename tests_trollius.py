@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 import uuid
 from functools import wraps
 
-from cassandra.cluster import Cluster
-
 import trollius
 from aiocassandra import aiosession
+from cassandra.cluster import Cluster
 from trollius import From
 
 try:
@@ -34,6 +33,7 @@ class AiosessionTestCase(unittest.TestCase):
     def setUp(self):
         trollius.set_event_loop(None)
         self.loop = trollius.new_event_loop()
+        self.loop.set_debug(True)
         self.cluster = Cluster()
         self.session = self.cluster.connect()
         aiosession(self.session, loop=self.loop)

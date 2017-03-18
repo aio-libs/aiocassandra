@@ -14,7 +14,9 @@ except ImportError:
 def get_version():
     regex = r"__version__\s=\s\'(?P<version>[\d\.]+?)\'"
 
-    return re.search(regex, read('aiocassandra.py')).group('version')
+    path = 'aiocassandra.py'
+
+    return re.search(regex, read(path)).group('version')
 
 
 def read(*parts):
@@ -39,7 +41,6 @@ setup(
     },
     py_modules=[str('aiocassandra')],
     zip_safe=False,
-    platforms='any',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -60,4 +61,5 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
+    keywords=['cassandra', 'asyncio'],
 )
