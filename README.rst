@@ -36,7 +36,7 @@ Usage
     def main(*, loop):
         # patches and adds `execute_future` to `cassandra.cluster.Session`
         aiosession(session, loop=loop)
-        return (yield session.execute_future(cql))
+        return (yield from session.execute_future(cql))
 
     loop = asyncio.get_event_loop()
 
