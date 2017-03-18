@@ -1,5 +1,6 @@
 dist: trusty
 language: python
+sudo: required
 python:
   - "2.7"
   - "3.3"
@@ -9,6 +10,8 @@ python:
   - "pypy"
 services:
   - cassandra
+before_script:
+  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
