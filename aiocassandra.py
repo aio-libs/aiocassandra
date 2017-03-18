@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 
 import sys
 from functools import partial
-from types import MethodType
 
 from cassandra.cluster import Session
+
+from types import MethodType  # isort:skip
 
 try:
     import asyncio

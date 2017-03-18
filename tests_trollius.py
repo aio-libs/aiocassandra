@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import unittest
 import uuid
 from functools import wraps
 
@@ -8,11 +9,6 @@ import trollius
 from aiocassandra import aiosession
 from cassandra.cluster import Cluster
 from trollius import From
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 
 
 def run_loop(fn):
