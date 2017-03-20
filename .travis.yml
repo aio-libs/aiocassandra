@@ -11,13 +11,12 @@ python:
 services:
   - cassandra
 before_script:
-  - sudo sh -c "echo 'JVM_OPTS=\"$JVM_OPTS -Djava.net.preferIPv4Stack=false\"' >> /usr/local/cassandra/conf/cassandra-env.sh"
-  - sudo service cassandra start
   - /opt/python/2.7/bin/pip install virtualenv
   - /opt/python/2.7/bin/virtualenv env_cqlsh
   - source env_cqlsh/bin/activate
   - travis_retry travis_wait 30 pip install cqlsh
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
+
+  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion="4.1.1"; do sleep 1; echo -n '.'; done
   - deactivate
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
