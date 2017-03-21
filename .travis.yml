@@ -1,6 +1,7 @@
 dist: trusty
 language: python
 sudo: required
+
 python:
   - "2.7"
   - "3.3"
@@ -8,21 +9,39 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-services:
-  - cassandra
+env:
+  global:
+    - CMD_PATT=cassandra
+before_install:
+  - sudo add-apt-repository ppa:webupd8team/java
+  - echo "deb http://www.apache.org/dist/cassandra/debian 22x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+  - gpg --keyserver pgp.mit.edu --recv-keys F758CE318D77295D
+  - gpg --export --armor F758CE318D77295D | sudo apt-key add -
+  - gpg --keyserver pgp.mit.edu --recv-keys 2B5C1B00
+  - gpg --export --armor 2B5C1B00 | sudo apt-key add -
+  - gpg --keyserver pgp.mit.edu --recv-keys 0353B12C
+  - gpg --export --armor 0353B12C | sudo apt-key add -
+  - sudo apt-get update
+install:
+  - sudo apt-get install oracle-java8-set-default
+  - java -version
+  - sudo apt-get install cassandra
 before_script:
+  - sudo service cassandra start
+  - sudo service cassandra status
+  - sudo nodetool status
   - /opt/python/2.7/bin/pip install virtualenv
   - /opt/python/2.7/bin/virtualenv env_cqlsh
   - source env_cqlsh/bin/activate
   - travis_retry travis_wait 30 pip install cqlsh
 
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh 127.0.0.1 --cqlversion=3.4.0; do sleep 1; echo -n '.'; done
+  # - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
   - deactivate
 script:
-  - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
-  - echo "$TOXENV"
+  # - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
+  # - echo "$TOXENV"
 
-  - tox
+  # - tox
 cache:
   directories:
     - $HOME/.cache/pip
