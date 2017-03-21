@@ -10,8 +10,6 @@ python:
   - "3.6"
   - "pypy"
 env:
-  global:
-    - CMD_PATT=cassandra
   matrix:
     - CASSANDRA_VERSION=22x
     - CASSANDRA_VERSION=39x
@@ -19,12 +17,8 @@ env:
 before_install:
   - sudo add-apt-repository -y ppa:webupd8team/java
   - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
-  - gpg --keyserver pgp.mit.edu --recv-keys F758CE318D77295D
-  - gpg --export --armor F758CE318D77295D | sudo apt-key add -
-  - gpg --keyserver pgp.mit.edu --recv-keys 2B5C1B00
-  - gpg --export --armor 2B5C1B00 | sudo apt-key add -
-  - gpg --keyserver pgp.mit.edu --recv-keys 0353B12C
-  - gpg --export --armor 0353B12C | sudo apt-key add -
+  - echo "deb-src http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+  - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
   - sudo apt-get update -y
 install:
   - sudo apt-get install -y oracle-java8-set-default
