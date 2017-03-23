@@ -29,7 +29,9 @@ before_script:
   - /opt/python/2.7/bin/virtualenv env_cqlsh
   - source env_cqlsh/bin/activate
   - travis_retry travis_wait 30 pip install cqlsh
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
+  - sleep 20
+  - cqlsh
+  # - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
   - deactivate
   - pip install tox
 script:
