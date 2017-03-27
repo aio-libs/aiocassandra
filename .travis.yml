@@ -8,19 +8,32 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-services:
-  - cassandra
+env:
+  matrix:
+    - CASSANDRA_VERSION=22x CQL_VERSION=3.3.1
+    - CASSANDRA_VERSION=39x CQL_VERSION=3.4.2
+before_install:
+  - sudo add-apt-repository -y ppa:webupd8team/java
+  - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+  - echo "deb-src http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+  - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+  - sudo apt-get update -y
+install:
+  - sudo apt-get install -y oracle-java8-set-default
+  - java -version
+  - sudo apt-get install -y cassandra
 before_script:
+  - sudo service cassandra start
   - /opt/python/2.7/bin/pip install virtualenv
   - /opt/python/2.7/bin/virtualenv env_cqlsh
   - source env_cqlsh/bin/activate
   - travis_retry travis_wait 30 pip install cqlsh
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
+  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
   - deactivate
+  - pip install tox
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
-
   - tox
 cache:
   directories:
