@@ -11,8 +11,8 @@ python:
   - "pypy"
 env:
   matrix:
-    - CASSANDRA_VERSION=22x
-    - CASSANDRA_VERSION=39x
+    - CASSANDRA_VERSION=22x CQLVERSION=3.3.1
+    - CASSANDRA_VERSION=39x CQLVERSION=3.4.2
 before_install:
   - sudo add-apt-repository -y ppa:webupd8team/java
   - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
@@ -30,7 +30,7 @@ before_script:
   - source env_cqlsh/bin/activate
   - travis_retry travis_wait 30 pip install cqlsh
   - sleep 20
-  - cqlsh
+  - cqlsh --cqlversion=CQLVERSION
   # - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh; do sleep 1; echo -n '.'; done
   - deactivate
   - pip install tox
