@@ -7,7 +7,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy"
+  - "pypy-5.8.0"
 env:
   matrix:
     - CASSANDRA_VERSION=22x CQL_VERSION=3.4.2
