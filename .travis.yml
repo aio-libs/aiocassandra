@@ -38,4 +38,3 @@ script:
 cache: pip
 notifications:
   email: false
-  slack: oceanio:qISToAOQglhPzOlbJ3CjNJLF
