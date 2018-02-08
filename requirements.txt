@@ -1,6 +1,6 @@
 appdirs==1.4.3
 cassandra-driver==3.13.0
-Cython==0.25.2
+Cython==0.27.3
 flake8==3.3.0
 isort==4.2.5
 mccabe==0.6.1
