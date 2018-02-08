@@ -29,9 +29,9 @@ def read(*parts):
 setup(
     name='aiocassandra',
     version=get_version(),
-    author='wikibusiness',
-    author_email='osf@wikibusiness.org',
-    url='https://github.com/wikibusiness/aiocassandra',
+    author='Victor Kovtun',
+    author_email='hellysmile@gmail.com',
+    url='https://github.com/aio-libs/aiocassandra',
     description='Simple threaded cassandra wrapper for asyncio',
     long_description=read('README.rst'),
     install_requires=['cassandra-driver'],

@@ -3,8 +3,8 @@ aiocassandra
 
 :info: Simple threaded cassandra wrapper for asyncio
 
-.. image:: https://img.shields.io/travis/wikibusiness/aiocassandra.svg
-    :target: https://travis-ci.org/wikibusiness/aiocassandra
+.. image:: https://img.shields.io/travis/aio-libs/aiocassandra.svg
+    :target: https://travis-ci.org/aio-libs/aiocassandra
 
 .. image:: https://img.shields.io/pypi/v/aiocassandra.svg
     :target: https://pypi.python.org/pypi/aiocassandra
@@ -48,3 +48,10 @@ Usage
         loop.close()
 
 Python 2.7(trollius), 3.3+ and PyPy(trollius) are supported
+
+Thanks
+------
+
+The library was donated by `Ocean S.A. <https://ocean.io/>`_
+
+Thanks to the company for contribution.
