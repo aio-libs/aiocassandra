@@ -13,7 +13,7 @@ try:
 except ImportError:
     import trollius as asyncio
 
-__version__ = '1.0.4'
+__version__ = '1.1.0'
 
 
 def _asyncio_fut_factory(loop):
