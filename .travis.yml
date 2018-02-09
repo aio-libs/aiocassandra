@@ -6,7 +6,7 @@ python:
   - "3.6"
 env:
   matrix:
-    - CASSANDRA_VERSION=311x CQL_VERSION=3.4.2
+    - CASSANDRA_VERSION=311x CQL_VERSION=3.4.4
 before_install:
   - sudo add-apt-repository -y ppa:webupd8team/java
   - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
