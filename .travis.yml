@@ -31,8 +31,9 @@ before_script:
   - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
   - deactivate
 script:
-  - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
+  - export TOXENV=py`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
+
   - tox
 cache: pip
 notifications:
