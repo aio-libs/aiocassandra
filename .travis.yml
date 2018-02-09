@@ -38,6 +38,10 @@ notifications:
 
 
 before_deploy:
+  - pip install virtualenv
+  - virtualenv env_deploy
+  - source env_deploy/bin/activate
+  - python -V
   - sudo chown --changes --recursive $(whoami):$(id --group $(whoami)) /usr > /dev/null 2>&1
 deploy:
   provider: pypi
