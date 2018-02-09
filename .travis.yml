@@ -18,10 +18,7 @@ install:
   - java -version
   - sudo apt-get install -y cassandra
 
-  - pip install -U setuptools
-  - pip install -U pip
-  - pip install -U wheel
-  - pip install -U tox
+  - sudo pip install tox
 before_script:
   - sudo service cassandra start
   - /opt/python/2.7/bin/pip install virtualenv
