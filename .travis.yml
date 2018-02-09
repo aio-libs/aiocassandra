@@ -38,7 +38,7 @@ notifications:
 
 
 before_deploy:
-  - sudo chown --changes --recursive $(whoami):$(id --group $(whoami)) /usr/local/lib/python2.7/
+  - sudo chown --changes --recursive $(whoami):$(id --group $(whoami)) /usr
 deploy:
   provider: pypi
   user: hellysmile
