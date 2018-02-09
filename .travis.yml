@@ -2,16 +2,11 @@ dist: trusty
 language: python
 sudo: required
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy3.5-5.8.0"
 env:
   matrix:
-    - CASSANDRA_VERSION=22x CQL_VERSION=3.4.2
-    - CASSANDRA_VERSION=39x CQL_VERSION=3.4.2
+    - CASSANDRA_VERSION=311x CQL_VERSION=3.4.2
 before_install:
   - sudo add-apt-repository -y ppa:webupd8team/java
   - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
@@ -22,6 +17,11 @@ install:
   - sudo apt-get install -y oracle-java8-set-default
   - java -version
   - sudo apt-get install -y cassandra
+
+  - pip install -U setuptools
+  - pip install -U pip
+  - pip install -U wheel
+  - pip install -U tox
 before_script:
   - sudo service cassandra start
   - /opt/python/2.7/bin/pip install virtualenv
@@ -30,7 +30,6 @@ before_script:
   - pip install cqlsh
   - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
   - deactivate
-  - sudo pip install tox
 script:
   - export TOXENV=py`python -c 'import sys; print("py" if "__pypy__" in sys.builtin_module_names else "".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
