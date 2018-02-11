@@ -25,12 +25,9 @@ before_install:
 install:
 - pip install tox
 before_script:
-  - /opt/python/2.7/bin/pip install virtualenv
-  - /opt/python/2.7/bin/virtualenv env_cqlsh
-  - source env_cqlsh/bin/activate
-  - pip install cqlsh
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
-  - deactivate
+- virtualenv -p python2.7 env_cqlsh
+- env_cqlsh/bin/pip install cqlsh
+- echo 'waiting for cassandra is up'; while ! echo "exit" | env_cqlsh/bin/cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
 script:
   - export TOXENV=py`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
