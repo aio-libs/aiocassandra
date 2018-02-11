@@ -25,7 +25,6 @@ before_install:
 install:
 - pip install tox
 before_script:
-  - sudo service cassandra start
   - /opt/python/2.7/bin/pip install virtualenv
   - /opt/python/2.7/bin/virtualenv env_cqlsh
   - source env_cqlsh/bin/activate
