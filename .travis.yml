@@ -17,17 +17,12 @@ addons:
     - cassandra
 services:
 - cassandra
-env:
-  matrix:
-  - CQL_VERSION=3.4.4
 before_install:
   - java -version
 install:
 - pip install tox
 before_script:
-- virtualenv -p python2.7 env_cqlsh
-- env_cqlsh/bin/pip install cqlsh
-- echo 'waiting for cassandra is up'; while ! echo "exit" | env_cqlsh/bin/cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
+- tox -ewait-for-cassandra
 script:
   - export TOXENV=py`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
   - echo "$TOXENV"
