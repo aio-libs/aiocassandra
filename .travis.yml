@@ -1,31 +1,37 @@
 dist: trusty
-language: python
 sudo: required
+
+language: python
 python:
 - 3.5
 - 3.6
+
+cache: pip
+
 addons:
   apt:
     sources:
     - sourceline: 'ppa:webupd8team/java'
     - sourceline: 'deb http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: https://www.apache.org/dist/cassandra/KEYS
+      key_url: &apache-key https://www.apache.org/dist/cassandra/KEYS
     - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: https://www.apache.org/dist/cassandra/KEYS
+      key_url: *apache-key
     packages:
     - oracle-java8-set-default
     - cassandra
 services:
 - cassandra
+
 before_install:
-  - java -version
+- java -version
 install:
 - pip install tox
+
 before_script:
-- tox -ewait-for-cassandra
+- tox -e wait-for-cassandra
 script:
-- tox -epython
-cache: pip
+- tox -e python
+
 notifications:
   email: false
 
