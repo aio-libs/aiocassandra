@@ -4,6 +4,8 @@ sudo: required
 python:
   - "3.5"
   - "3.6"
+services:
+- cassandra
 env:
   matrix:
     - CASSANDRA_VERSION=311x CQL_VERSION=3.4.4
