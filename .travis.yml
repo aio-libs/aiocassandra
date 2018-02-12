@@ -44,9 +44,9 @@ jobs:
     addons: {}
     services: []
     before_install: []
-    install: []
+    install: skip
     before_script: []
-    script: []
+    script: skip
     deploy:
       provider: pypi
       user: hellysmile
