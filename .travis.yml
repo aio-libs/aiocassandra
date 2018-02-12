@@ -36,19 +36,26 @@ before_script:
 script:
 - tox -e python
 
+jobs:
+  include:
+  - name: Push to PYPI (runs only for tagged commits)
+    if: tag IS present
+    python: 3.6
+    addons: {}
+    services: []
+    before_install: []
+    install: []
+    before_script: []
+    script: []
+    deploy:
+      provider: pypi
+      user: hellysmile
+      password:
+        secure: "EG6ZiN/WbbfObG8+GCFh3e5kzqdcv35gHcP+bJ1GjJL6sw4ohWBYXZCX1mo/ScYNFcVJzR/TxPp1hSKhgBG5m/X/tTm7tvenpq/44B8xTFX4I8G18AW5k7Jj7kR321eXS13txQ/3a43k38icfEzmMKy3U01cOwJE9X9dVq57zZpSpAk3O+eMqAnfvQN620TaxYoBGlQ8jBgwtw8F3IQXStRm1QCIdCpYXttMxTWTPbdDgTnoDiMa76JYuYIaGiOvm544INjrJyXDMQx9bY+jxnV/AcCkSF3FODnoO9DuFU0NdUzQB0gRtGo8ZKeKR1Q1vcufWubnbU3fRvaHUQPXirS3T6yu+GZ5gcwt4s54VPeYShwL55DK0r8h6IQWYr/ZhGUoWVm9adGmnoP1SDycbjsu0Prq8XzQT4BePmto4yNZbTYsgFuLTXFA+AWZ1QL20MPgTM5yqrIbUnG04uGHEWiuZfHnT8kjpJleOFOtCm3WHLJGHyeFHduANLiEPjVwORFqNEXRH/QjFNLkd+Q1EkkusPt/WMCMmz0v2a9lVle/h+3jB3XSP0KN38xNmQDjU4vFR0LURVs4pyKc51EKwhi/3sbMb47SsCwhGyJATg/TgVTTM90/CLq9W3Q7dEy4qPejUI7YD5kixKIBh7w5jB08X26fy98IXYh/KfBmow4="
+      distributions: sdist bdist_wheel
+      on:
+        tags: true
+        all_branches: true
+
 notifications:
   email: false
-
-# seems to be bug at travis due sudo mode, deploy tries to use system 2.7 python, instead of 3.5
-# before_deploy:
-#   - sudo chown --changes --recursive $(whoami):$(id --group $(whoami)) /usr > /dev/null 2>&1
-# deploy:
-#   provider: pypi
-#   user: hellysmile
-#   password:
-#     secure: "EG6ZiN/WbbfObG8+GCFh3e5kzqdcv35gHcP+bJ1GjJL6sw4ohWBYXZCX1mo/ScYNFcVJzR/TxPp1hSKhgBG5m/X/tTm7tvenpq/44B8xTFX4I8G18AW5k7Jj7kR321eXS13txQ/3a43k38icfEzmMKy3U01cOwJE9X9dVq57zZpSpAk3O+eMqAnfvQN620TaxYoBGlQ8jBgwtw8F3IQXStRm1QCIdCpYXttMxTWTPbdDgTnoDiMa76JYuYIaGiOvm544INjrJyXDMQx9bY+jxnV/AcCkSF3FODnoO9DuFU0NdUzQB0gRtGo8ZKeKR1Q1vcufWubnbU3fRvaHUQPXirS3T6yu+GZ5gcwt4s54VPeYShwL55DK0r8h6IQWYr/ZhGUoWVm9adGmnoP1SDycbjsu0Prq8XzQT4BePmto4yNZbTYsgFuLTXFA+AWZ1QL20MPgTM5yqrIbUnG04uGHEWiuZfHnT8kjpJleOFOtCm3WHLJGHyeFHduANLiEPjVwORFqNEXRH/QjFNLkd+Q1EkkusPt/WMCMmz0v2a9lVle/h+3jB3XSP0KN38xNmQDjU4vFR0LURVs4pyKc51EKwhi/3sbMb47SsCwhGyJATg/TgVTTM90/CLq9W3Q7dEy4qPejUI7YD5kixKIBh7w5jB08X26fy98IXYh/KfBmow4="
-#   distributions: "sdist upload"
-#   on:
-#     tags: true
-#     all_branches: true
-#     python: 3.5
