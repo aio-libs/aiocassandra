@@ -38,7 +38,7 @@ script:
 
 jobs:
   include:
-  - name: Push to PYPI (runs only for tagged commits)
+  - stage: Push to PYPI (runs only for tagged commits)
     if: tag IS present
     python: 3.6
     addons: {}
