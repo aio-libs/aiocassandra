@@ -3,11 +3,14 @@ aiocassandra
 
 :info: Simple threaded cassandra wrapper for asyncio
 
-.. image:: https://img.shields.io/travis/aio-libs/aiocassandra.svg
+.. image:: https://travis-ci.org/aio-libs/aiocassandra.svg?branch=master
     :target: https://travis-ci.org/aio-libs/aiocassandra
 
 .. image:: https://img.shields.io/pypi/v/aiocassandra.svg
     :target: https://pypi.python.org/pypi/aiocassandra
+
+.. image:: https://codecov.io/gh/aio-libs/aiocassandra/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/aio-libs/aiocassandra
 
 Installation
 ------------
