@@ -45,6 +45,7 @@ jobs:
     install: skip
     before_script: []
     script: skip
+    after_success: []
     deploy:
       provider: pypi
       user: hellysmile
