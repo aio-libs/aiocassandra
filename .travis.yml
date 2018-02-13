@@ -9,11 +9,15 @@ python:
 
 cache: pip
 
+env:
+  matrix:
+    - CASSANDRA_VERSION=311x CQL_VERSION=3.4.4
+
 addons:
   apt:
     sources:
     - sourceline: 'ppa:webupd8team/java'
-    - sourceline: 'deb http://www.apache.org/dist/cassandra/debian 311x main'
+    - sourceline: 'deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main'
       key_url: &apache-key https://www.apache.org/dist/cassandra/KEYS
     - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
       key_url: *apache-key
