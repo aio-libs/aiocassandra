@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import io
 import os
 import re
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 
 def get_version():
@@ -35,11 +31,8 @@ setup(
     description='Simple threaded cassandra wrapper for asyncio',
     long_description=read('README.rst'),
     install_requires=['cassandra-driver'],
-    extras_require={
-        ':python_version=="3.3"': ['asyncio'],
-        ':python_version=="2.7"': ['trollius'],
-    },
-    py_modules=[str('aiocassandra')],
+    python_requires='>=3.4.0',
+    py_modules=['aiocassandra'],
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -48,13 +41,10 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: PyPy',
     ],
     keywords=['cassandra', 'asyncio'],
 )
