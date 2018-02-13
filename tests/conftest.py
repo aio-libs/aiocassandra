@@ -41,6 +41,8 @@ def event_loop(request):
     loop.close()
 
     gc.collect()
+    # for pypy
+    gc.collect()
 
 
 @pytest.fixture
