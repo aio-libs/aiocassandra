@@ -6,6 +6,7 @@ python:
 - 3.4
 - 3.5
 - 3.6
+- pypy3.5-5.10.0
 
 cache: pip
 
@@ -23,9 +24,6 @@ addons:
 services:
 - cassandra
 
-before_install:
-- java -version
-- python -V
 install:
 - pip install tox
 
