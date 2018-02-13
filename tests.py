@@ -1,26 +1,59 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+import asyncio
+import unittest
+import uuid
+from functools import wraps
 
-import os  # noqa # isort:skip
-import sys  # noqa # isort:skip
-import unittest  # noqa # isort:skip
-
-os.environ['PYTHONASYNCIODEBUG'] = '1'  # noqa # isort:skip
-
-from aiocassandra import aiosession  # noqa # isort:skip
-from cassandra.cluster import Cluster   # noqa # isort:skip
+from aiocassandra import aiosession
+from cassandra.cluster import Cluster
 
 
-if sys.version_info >= (3, 3):
-    import asyncio
-    from tests_asyncio import AiosessionTestCase
-else:
-    import trollius as asyncio
-    from tests_trollius import AiosessionTestCase
+def run_loop(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        self = args[0]
+
+        loop = self.loop
+
+        coro = fn(*args, **kwargs)
+
+        return loop.run_until_complete(coro)
+
+    return wrapped
 
 
-class AiocassandraTestCase(AiosessionTestCase):
+class AiocassandraTestCase(unittest.TestCase):
+
+    def setUp(self):
+        asyncio.set_event_loop(None)
+        self.loop = asyncio.new_event_loop()
+        self.cluster = Cluster()
+        self.session = self.cluster.connect()
+
+        aiosession(self.session, loop=self.loop)
+
+    @run_loop
+    @asyncio.coroutine
+    def test_execute_future_prepare(self):
+        cql = self.session.prepare('SELECT now() as now FROM system.local;')
+
+        ret = yield from self.session.execute_future(cql)
+
+        self.assertEqual(len(ret), 1)
+
+        self.assertIsInstance(ret[0].now, uuid.UUID)
+
+    @run_loop
+    @asyncio.coroutine
+    def test_execute_future(self):
+        cql = 'SELECT now() as now FROM system.local;'
+
+        ret = yield from self.session.execute_future(cql)
+
+        self.assertEqual(len(ret), 1)
+
+        self.assertIsInstance(ret[0].now, uuid.UUID)
+
     def test_malformed_session(self):
         with self.assertRaises(AssertionError):
             aiosession(None)
@@ -30,33 +63,28 @@ class AiocassandraTestCase(AiosessionTestCase):
             aiosession(self.session, loop=self.loop)
 
     def test_main_thread_loop_missing(self):
+        cluster = Cluster()
+        session = cluster.connect()
+
         with self.assertRaises(RuntimeError):
-            try:
-                cluster = Cluster()
-
-                session = cluster.connect()
-
-                aiosession(session)
-            finally:
-                cluster.shutdown()
-
-    def test_main_thread_loop(self):
-        try:
-            loop = asyncio.new_event_loop()
-            loop.set_debug(True)
-            asyncio.set_event_loop(loop)
-
-            cluster = Cluster()
-            session = cluster.connect()
-
             aiosession(session)
 
-            self.assertIs(loop, session._loop)
-        finally:
-            cluster.shutdown()
-            loop.call_soon(loop.stop)
-            loop.run_forever()
-            loop.close()
+        cluster.shutdown()
+
+    def test_main_thread_loop(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        cluster = Cluster()
+        session = cluster.connect()
+
+        aiosession(session)
+
+        self.assertIs(loop, session._loop)
+
+        cluster.shutdown()
+        loop.call_soon(loop.stop)
+        loop.run_forever()
+        loop.close()
 
     def test_explicit_loop(self):
         self.assertIs(self.loop, self.session._loop)

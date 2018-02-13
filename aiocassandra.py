@@ -1,19 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-import sys
+import asyncio
 from functools import partial
+from types import MethodType
 
 from cassandra.cluster import Session
 
-from types import MethodType  # isort:skip
-
-try:
-    import asyncio
-except ImportError:
-    import trollius as asyncio
-
-__version__ = '1.1.0'
+__version__ = '1.1.1a'
 
 
 def _asyncio_fut_factory(loop):
@@ -53,16 +44,11 @@ def aiosession(session, loop=None):
     if loop is None:
         loop = asyncio.get_event_loop()
 
-    setattr(session, '_loop', loop)
-    setattr(session, '_asyncio_fut_factory', _asyncio_fut_factory(loop=loop))
+    session._loop = loop
+    session._asyncio_fut_factory = _asyncio_fut_factory(loop=loop)
 
-    if sys.version_info >= (3, 0):
-        session._asyncio_result = MethodType(_asyncio_result, session)
-        session._asyncio_exception = MethodType(_asyncio_exception, session)
-        session.execute_future = MethodType(execute_future, session)
-    else:
-        session._asyncio_result = MethodType(_asyncio_result, session, Session)
-        session._asyncio_exception = MethodType(_asyncio_exception, session, Session)  # noqa
-        session.execute_future = MethodType(execute_future, session, Session)
+    session._asyncio_result = MethodType(_asyncio_result, session)
+    session._asyncio_exception = MethodType(_asyncio_exception, session)
+    session.execute_future = MethodType(execute_future, session)
 
     return session

@@ -1,51 +1,58 @@
 dist: trusty
-language: python
 sudo: required
+
+language: python
 python:
-  - "3.5"
-  - "3.6"
-env:
-  matrix:
-    - CASSANDRA_VERSION=311x CQL_VERSION=3.4.4
-before_install:
-  - sudo add-apt-repository -y ppa:webupd8team/java
-  - echo "deb http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
-  - echo "deb-src http://www.apache.org/dist/cassandra/debian $CASSANDRA_VERSION main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
-  - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
-  - sudo apt-get update -y
-install:
-  - sudo apt-get install -y oracle-java8-set-default
-  - java -version
-  - sudo apt-get install -y cassandra
+- 3.4
+- 3.5
+- 3.6
+- pypy3.5-5.10.0
 
-  - sudo pip install tox
-before_script:
-  - sudo service cassandra start
-  - /opt/python/2.7/bin/pip install virtualenv
-  - /opt/python/2.7/bin/virtualenv env_cqlsh
-  - source env_cqlsh/bin/activate
-  - pip install cqlsh
-  - echo 'waiting for cassandra is up'; while ! echo "exit" | cqlsh --cqlversion=$CQL_VERSION; do sleep 1; echo -n '.'; done
-  - deactivate
-script:
-  - export TOXENV=py`python -c 'import sys; print("".join(map(str, sys.version_info[:2])))'`
-  - echo "$TOXENV"
-
-  - tox
 cache: pip
-notifications:
-  email: false
 
-# seems to be bug at travis due sudo mode, deploy tries to use system 2.7 python, instead of 3.5
-# before_deploy:
-#   - sudo chown --changes --recursive $(whoami):$(id --group $(whoami)) /usr > /dev/null 2>&1
-# deploy:
-#   provider: pypi
-#   user: hellysmile
-#   password:
-#     secure: "EG6ZiN/WbbfObG8+GCFh3e5kzqdcv35gHcP+bJ1GjJL6sw4ohWBYXZCX1mo/ScYNFcVJzR/TxPp1hSKhgBG5m/X/tTm7tvenpq/44B8xTFX4I8G18AW5k7Jj7kR321eXS13txQ/3a43k38icfEzmMKy3U01cOwJE9X9dVq57zZpSpAk3O+eMqAnfvQN620TaxYoBGlQ8jBgwtw8F3IQXStRm1QCIdCpYXttMxTWTPbdDgTnoDiMa76JYuYIaGiOvm544INjrJyXDMQx9bY+jxnV/AcCkSF3FODnoO9DuFU0NdUzQB0gRtGo8ZKeKR1Q1vcufWubnbU3fRvaHUQPXirS3T6yu+GZ5gcwt4s54VPeYShwL55DK0r8h6IQWYr/ZhGUoWVm9adGmnoP1SDycbjsu0Prq8XzQT4BePmto4yNZbTYsgFuLTXFA+AWZ1QL20MPgTM5yqrIbUnG04uGHEWiuZfHnT8kjpJleOFOtCm3WHLJGHyeFHduANLiEPjVwORFqNEXRH/QjFNLkd+Q1EkkusPt/WMCMmz0v2a9lVle/h+3jB3XSP0KN38xNmQDjU4vFR0LURVs4pyKc51EKwhi/3sbMb47SsCwhGyJATg/TgVTTM90/CLq9W3Q7dEy4qPejUI7YD5kixKIBh7w5jB08X26fy98IXYh/KfBmow4="
-#   distributions: "sdist upload"
-#   on:
-#     tags: true
-#     all_branches: true
-#     python: 3.5
+addons:
+  apt:
+    sources:
+    - sourceline: 'ppa:webupd8team/java'
+    - sourceline: 'deb http://www.apache.org/dist/cassandra/debian 311x main'
+      key_url: &apache-key https://www.apache.org/dist/cassandra/KEYS
+    - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
+      key_url: *apache-key
+    packages:
+    - oracle-java8-set-default
+    - cassandra
+services:
+- cassandra
+
+install:
+- pip install tox
+
+before_script:
+- tox -e wait-for-cassandra
+script:
+- tox -e python
+
+jobs:
+  include:
+  - stage: Push to PYPI (runs only for tagged commits)
+    if: tag IS present
+    python: 3.6
+    addons: {}
+    services: []
+    before_install: []
+    install: skip
+    before_script: []
+    script: skip
+    deploy:
+      provider: pypi
+      user: hellysmile
+      password:
+        secure: "EG6ZiN/WbbfObG8+GCFh3e5kzqdcv35gHcP+bJ1GjJL6sw4ohWBYXZCX1mo/ScYNFcVJzR/TxPp1hSKhgBG5m/X/tTm7tvenpq/44B8xTFX4I8G18AW5k7Jj7kR321eXS13txQ/3a43k38icfEzmMKy3U01cOwJE9X9dVq57zZpSpAk3O+eMqAnfvQN620TaxYoBGlQ8jBgwtw8F3IQXStRm1QCIdCpYXttMxTWTPbdDgTnoDiMa76JYuYIaGiOvm544INjrJyXDMQx9bY+jxnV/AcCkSF3FODnoO9DuFU0NdUzQB0gRtGo8ZKeKR1Q1vcufWubnbU3fRvaHUQPXirS3T6yu+GZ5gcwt4s54VPeYShwL55DK0r8h6IQWYr/ZhGUoWVm9adGmnoP1SDycbjsu0Prq8XzQT4BePmto4yNZbTYsgFuLTXFA+AWZ1QL20MPgTM5yqrIbUnG04uGHEWiuZfHnT8kjpJleOFOtCm3WHLJGHyeFHduANLiEPjVwORFqNEXRH/QjFNLkd+Q1EkkusPt/WMCMmz0v2a9lVle/h+3jB3XSP0KN38xNmQDjU4vFR0LURVs4pyKc51EKwhi/3sbMb47SsCwhGyJATg/TgVTTM90/CLq9W3Q7dEy4qPejUI7YD5kixKIBh7w5jB08X26fy98IXYh/KfBmow4="
+      distributions: sdist bdist_wheel
+      on:
+        tags: true
+        all_branches: true
+
+notifications:
+  email:
+    on_success: never

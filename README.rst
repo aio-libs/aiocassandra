@@ -47,7 +47,7 @@ Usage
         cluster.shutdown()
         loop.close()
 
-Python 2.7(trollius), 3.3+ and PyPy(trollius) are supported
+Python 3.4+ is required
 
 Thanks
 ------
