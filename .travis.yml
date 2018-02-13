@@ -3,7 +3,6 @@ sudo: required
 
 language: python
 python:
-- 3.4
 - 3.5
 - 3.6
 - pypy3.5-5.10.0
@@ -31,6 +30,9 @@ before_script:
 - tox -e wait-for-cassandra
 script:
 - tox -e python
+after_success:
+  - pip install codecov
+  - codecov
 
 jobs:
   include:

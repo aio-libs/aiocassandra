@@ -1,8 +1,11 @@
 import io
 import os
 import re
+import sys
 
 from setuptools import setup
+
+needs_pytest = 'pytest' in set(sys.argv)
 
 
 def get_version():
@@ -29,6 +32,8 @@ setup(
     description='Simple threaded cassandra wrapper for asyncio',
     long_description=read('README.rst'),
     install_requires=['cassandra-driver'],
+    setup_requires=['pytest-runner'] if needs_pytest else [],
+    tests_require=['pytest', 'pytest-asyncio', 'pytest-cov'],
     python_requires='>=3.4.0',
     py_modules=['aiocassandra'],
     zip_safe=False,
