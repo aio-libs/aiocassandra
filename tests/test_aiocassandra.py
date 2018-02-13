@@ -76,6 +76,31 @@ async def test_execute_future_cancel(cassandra, caplog, loop):
         await fut
 
 
+@pytest.mark.asyncio
+async def test_execute_future_cancel_error(cassandra, caplog, loop):
+    cql = 'SELECT 1;'
+
+    old_fut_factory = cassandra._asyncio_fut_factory
+
+    def new_patch_factory():
+        fut = old_fut_factory()
+        fut.cancel()
+        return fut
+
+    cassandra._asyncio_fut_factory = new_patch_factory
+
+    fut = cassandra.execute_future(cql)
+
+    assert asyncio.isfuture(fut)
+
+    with caplog.at_level(logging.ERROR):
+        await asyncio.sleep(0.1, loop=loop)
+        assert len(caplog.records) == 0
+
+    with pytest.raises(asyncio.CancelledError):
+        await fut
+
+
 def test_malformed_session():
     with pytest.raises(AssertionError):
         aiosession(None)
