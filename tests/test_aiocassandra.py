@@ -2,9 +2,10 @@ import asyncio
 import uuid
 
 import pytest
-from aiocassandra import aiosession
 from cassandra.cluster import Cluster
 from cassandra.protocol import SyntaxException
+
+from aiocassandra import aiosession
 
 
 @pytest.mark.asyncio

@@ -3,8 +3,9 @@ import gc
 import os
 
 import pytest
-from aiocassandra import aiosession
 from cassandra.cluster import Cluster
+
+from aiocassandra import aiosession
 
 asyncio.set_event_loop(None)
 
