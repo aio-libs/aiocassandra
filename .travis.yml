@@ -30,6 +30,9 @@ before_script:
 - tox -e wait-for-cassandra
 script:
 - tox -e python
+after_success:
+  - pip install codecov
+  - codecov
 
 jobs:
   include:
