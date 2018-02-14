@@ -18,7 +18,7 @@ async def main(*, loop):
 
     # best way is to use cassandra prepared statements
     # https://cassandra-zone.com/prepared-statements/
-    # https://datastax.github.io/python-driver/getting_started.html?highlight=prepare#prepared-statements
+    # https://datastax.github.io/python-driver/api/cassandra/cluster.html#cassandra.cluster.Session.prepare
     # try to create them once on application init
     query = session.prepare('SELECT now() FROM system.local;')
 
