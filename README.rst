@@ -28,29 +28,46 @@ Usage
 
     from aiocassandra import aiosession
     from cassandra.cluster import Cluster
+    from cassandra.query import SimpleStatement
 
+    # connection is blocking call
     cluster = Cluster()
+    # aiocassandra uses executor_threads to talk to cassndra driver
+    # https://datastax.github.io/python-driver/api/cassandra/cluster.html?highlight=executor_threads
     session = cluster.connect()
 
-    # best way is to use cassandra prepared statements
-    cql = session.prepare('SELECT now() FROM system.local;')
 
-    @asyncio.coroutine
-    def main(*, loop):
-        # patches and adds `execute_future` to `cassandra.cluster.Session`
-        aiosession(session, loop=loop)
-        return (yield from session.execute_future(cql))
+    async def main(*, loop):
+        # patches and adds `execute_future`, `execute_future` and `prepare_future`
+        # to `cassandra.cluster.Session`
+        aiosession(session)
+
+        # best way is to use cassandra prepared statements
+        # https://cassandra-zone.com/prepared-statements/
+        # https://datastax.github.io/python-driver/getting_started.html?highlight=prepare#prepared-statements
+        # try to create them once on application init
+        query = session.prepare('SELECT now() FROM system.local;')
+
+        # if non-blocking prepared statements is really needed:
+        query = await session.prepare_future('SELECT now() FROM system.local;')
+
+        print(await session.execute_future(query))
+
+        # pagination is also supported
+        query = 'SELECT * FROM system.size_estimates;'
+        statement = SimpleStatement(query, fetch_size=100)
+
+        # don't miss *s* (execute_futureS)
+        async for row in session.execute_futures(statement):
+            print(row)
+
 
     loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(loop=loop))
+    cluster.shutdown()
+    loop.close()
 
-    try:
-        response = loop.run_until_complete(main(loop=loop))
-        print(response)
-    finally:
-        cluster.shutdown()
-        loop.close()
-
-Python 3.4+ is required
+Python 3.5+ is required
 
 Thanks
 ------
