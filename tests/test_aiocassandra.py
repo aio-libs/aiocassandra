@@ -107,7 +107,8 @@ async def test_execute_future_cancel_error(cassandra, caplog, loop):
 
     with caplog.at_level(logging.ERROR):
         await asyncio.sleep(0.1, loop=loop)
-        assert len(caplog.records) == 0
+
+    assert len(caplog.records) == 0
 
     with pytest.raises(asyncio.CancelledError):
         await fut
@@ -132,6 +133,7 @@ async def test_execute_futures_simple_statement_empty(cassandra):
     cql = 'SELECT * FROM system_schema.types;'
     statement = SimpleStatement(cql, fetch_size=1)
 
+    # this tests show that there nothing found and no one records is executed
     async for _ in cassandra.execute_futures(statement):
         assert False
         _
