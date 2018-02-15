@@ -1,6 +1,9 @@
 import asyncio
+import logging
+import sys
 from collections import deque
 from functools import partial
+from threading import Event
 from types import MethodType
 
 from async_generator import async_generator, yield_
@@ -8,55 +11,89 @@ from cassandra.cluster import Session
 
 __version__ = '2.0.0a0'
 
+PY_352 = sys.version_info >= (3, 5, 2)
 
-@async_generator
-async def _paginator(cassandra_fut, *, loop):
-    _deque = deque()
-    _exc = None
-    _drain = asyncio.Event(loop=loop)
-    _finished = asyncio.Event(loop=loop)
+logger = logging.getLogger(__name__)
 
-    def _handle_page(rows):
-        for row in rows:
-            _deque.append(row)
 
-        loop.call_soon_threadsafe(_drain.set)
+class Paginator:
 
-        if cassandra_fut.has_more_pages:
-            cassandra_fut.start_fetching_next_page()
+    def __init__(self, cassandra_fut, *, executor, loop):
+        self.cassandra_fut = cassandra_fut
+
+        self._executor = executor
+        self._loop = loop
+
+        self._deque = deque()
+        self._exc = None
+        self._drain_event = asyncio.Event(loop=loop)
+        self._finish_event = asyncio.Event(loop=loop)
+        self._exit_event = Event()
+
+        self.cassandra_fut.add_callbacks(
+            callback=self._handle_page,
+            errback=self._handle_err
+        )
+
+    def _handle_page(self, rows):
+        if self._exit_event.is_set():
+            _len = len(rows)
+            logger.debug(
+                'Paginator is closed, skipping new %i records', _len)
             return
 
-        loop.call_soon_threadsafe(_finished.set)
+        for row in rows:
+            self._deque.append(row)
 
-    def _handle_err(exc):
-        nonlocal _exc
+        self._loop.call_soon_threadsafe(self._drain_event.set)
 
-        _exc = exc
+        if self.cassandra_fut.has_more_pages:
+            _fn = self.cassandra_fut.start_fetching_next_page
+            self._loop.run_in_executor(self._executor, _fn)
+            return
 
-        loop.call_soon_threadsafe(_drain.set)
+        self._loop.call_soon_threadsafe(self._finish_event.set)
 
-        loop.call_soon_threadsafe(_finished.set)
+    def _handle_err(self, exc):
+        self._exc = exc
 
-    cassandra_fut.add_callbacks(
-        callback=_handle_page,
-        errback=_handle_err
-    )
+        self._loop.call_soon_threadsafe(self._drain_event.set)
 
-    while _deque or not _finished.is_set():
-        if _exc is not None:
-            raise _exc
+        self._loop.call_soon_threadsafe(self._finish_event.set)
 
-        while _deque:
-            await yield_(_deque.popleft())
+    async def __aenter__(self):
+        return self
 
-        await asyncio.wait(
-            (
-                _drain.wait(),
-                _finished.wait(),
-            ),
-            return_when=asyncio.FIRST_COMPLETED,
-            loop=loop
-        )
+    async def __aexit__(self, *exc_info):
+        self._exit_event.set()
+        _len = len(self._deque)
+        self._deque.clear()
+        logger.debug(
+            'Paginator is closed, cleared in-memory %i records', _len)
+
+    def __aiter__(self):
+        return self._paginator()
+
+    if not PY_352:
+        __aiter__ = asyncio.coroutine(__aiter__)
+
+    @async_generator
+    async def _paginator(self):
+        while self._deque or not self._finish_event.is_set():
+            if self._exc is not None:
+                raise self._exc
+
+            while self._deque:
+                await yield_(self._deque.popleft())
+
+            await asyncio.wait(
+                (
+                    self._drain_event.wait(),
+                    self._finish_event.wait(),
+                ),
+                return_when=asyncio.FIRST_COMPLETED,
+                loop=self._loop
+            )
 
 
 def _asyncio_fut_factory(loop):
@@ -70,14 +107,14 @@ def _asyncio_result(self, fut, result):
     if fut.cancelled():
         return
 
-    self._loop.call_soon_threadsafe(fut.set_result, result)
+    self._asyncio_loop.call_soon_threadsafe(fut.set_result, result)
 
 
 def _asyncio_exception(self, fut, exc):
     if fut.cancelled():
         return
 
-    self._loop.call_soon_threadsafe(fut.set_exception, exc)
+    self._asyncio_loop.call_soon_threadsafe(fut.set_exception, exc)
 
 
 def execute_future(self, *args, **kwargs):
@@ -95,15 +132,19 @@ def execute_future(self, *args, **kwargs):
 
 def execute_futures(self, *args, **kwargs):
     cassandra_fut = self.execute_async(*args, **kwargs)
-    return _paginator(cassandra_fut, loop=self._loop)
+    return Paginator(
+        cassandra_fut,
+        executor=self._asyncio_executor,
+        loop=self._asyncio_loop,
+    )
 
 
 def prepare_future(self, *args, **kwargs):
-    statement = partial(self.prepare, *args, **kwargs)
-    return self._loop.run_in_executor(None, statement)
+    _fn = partial(self.prepare, *args, **kwargs)
+    return self._asyncio_loop.run_in_executor(self._asyncio_executor, _fn)
 
 
-def aiosession(session, loop=None):
+def aiosession(session, *, executor=None, loop=None):
     assert isinstance(session, Session), 'provide cassandra.cluster.Session'
 
     if hasattr(session, '_asyncio_fut_factory'):
@@ -112,7 +153,8 @@ def aiosession(session, loop=None):
     if loop is None:
         loop = asyncio.get_event_loop()
 
-    session._loop = loop
+    session._asyncio_loop = loop
+    session._asyncio_executor = executor
     session._asyncio_fut_factory = _asyncio_fut_factory(loop=loop)
 
     session._asyncio_result = MethodType(_asyncio_result, session)

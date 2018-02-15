@@ -58,8 +58,9 @@ Usage
         statement = SimpleStatement(query, fetch_size=100)
 
         # don't miss *s* (execute_futureS)
-        async for row in session.execute_futures(statement):
-            print(row)
+        async with session.execute_futures(statement) as paginator:
+            async for row in paginator:
+                print(row)
 
 
     loop = asyncio.get_event_loop()

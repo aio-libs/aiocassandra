@@ -120,8 +120,9 @@ async def test_execute_futures_simple(cassandra):
 
     ret = []
 
-    async for row in cassandra.execute_futures(cql):
-        ret.append(row)
+    async with cassandra.execute_futures(cql) as paginator:
+        async for row in paginator:
+            ret.append(row)
 
     assert len(ret) == 1
 
@@ -134,9 +135,10 @@ async def test_execute_futures_simple_statement_empty(cassandra):
     statement = SimpleStatement(cql, fetch_size=1)
 
     # this tests show that there nothing found and no one records is executed
-    async for _ in cassandra.execute_futures(statement):
-        assert False
-        _
+    async with cassandra.execute_futures(statement) as paginator:
+        async for _ in paginator:
+            assert False
+            _
 
 
 @pytest.mark.asyncio
@@ -146,11 +148,30 @@ async def test_execute_futures_simple_statement(cassandra):
 
     ret = []
 
-    async for row in cassandra.execute_futures(statement):
-        assert isinstance(row, tuple)
-        ret.append(row)
+    async with cassandra.execute_futures(statement) as paginator:
+        async for row in paginator:
+            assert isinstance(row, tuple)
+            ret.append(row)
 
     assert len(ret) != 0
+
+
+@pytest.mark.asyncio
+async def test_execute_futures_break(cassandra):
+    cql = 'SELECT * FROM system.size_estimates;'
+    statement = SimpleStatement(cql, fetch_size=100)
+
+    ret = []
+
+    async with cassandra.execute_futures(statement) as paginator:
+        async for row in paginator:
+            assert isinstance(row, tuple)
+            ret.append(row)
+            break
+
+    assert len(ret) == 1
+
+    assert len(paginator._deque) == 0
 
 
 def test_malformed_session():
@@ -175,11 +196,11 @@ def test_main_thread_loop(loop, session):
 
     aiosession(session)
 
-    assert loop is session._loop
+    assert loop is session._asyncio_loop
 
 
 def test_explicit_loop(cassandra, loop):
-    assert loop is cassandra._loop
+    assert loop is cassandra._asyncio_loop
 
 
 def test_session_patched(cassandra):
