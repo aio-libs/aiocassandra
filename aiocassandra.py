@@ -55,8 +55,6 @@ class _Paginator:
     def _handle_err(self, exc):
         self._exc = exc
 
-        self._loop.call_soon_threadsafe(self._drain_event.set)
-
         self._loop.call_soon_threadsafe(self._finish_event.set)
 
     async def __aenter__(self):
