@@ -6,7 +6,7 @@ from types import MethodType
 from async_generator import async_generator, yield_
 from cassandra.cluster import Session
 
-__version__ = '1.2.0a0'
+__version__ = '2.0.0a0'
 
 
 @async_generator
