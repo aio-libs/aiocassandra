@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from cassandra.cluster import Cluster
@@ -183,7 +184,7 @@ async def test_execute_futures_runtime_error(cassandra):
 
 
 def test_malformed_session():
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         aiosession(None)
 
 
@@ -209,6 +210,21 @@ def test_main_thread_loop(loop, session):
 
 def test_explicit_loop(cassandra, loop):
     assert loop is cassandra._asyncio_loop
+
+
+def test_explicit_executor(loop, session):
+    executor = ThreadPoolExecutor(max_workers=1)
+
+    aiosession(session, executor=executor, loop=loop)
+
+    assert executor is session._asyncio_executor
+
+    executor.shutdown(wait=True)
+
+
+def test_wrong_executor(loop, session):
+    with pytest.raises(RuntimeError):
+        aiosession(session, executor=1, loop=loop)
 
 
 def test_session_patched(cassandra):

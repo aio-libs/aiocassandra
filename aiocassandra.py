@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from threading import Event
 from types import MethodType
@@ -163,10 +164,18 @@ def prepare_future(self, *args, **kwargs):
 
 
 def aiosession(session, *, executor=None, loop=None):
-    assert isinstance(session, Session), 'provide cassandra.cluster.Session'
+    if not isinstance(session, Session):
+        raise RuntimeError(
+            'provide cassandra.cluster.Session')
 
     if hasattr(session, '_asyncio_fut_factory'):
-        raise RuntimeError('session is already patched by aiosession')
+        raise RuntimeError(
+            'session is already patched by aiosession')
+
+    if executor is not None:
+        if not isinstance(executor, ThreadPoolExecutor):
+            raise RuntimeError(
+                'executor should be instance of ThreadPoolExecutor')
 
     if loop is None:
         loop = asyncio.get_event_loop()
