@@ -119,7 +119,6 @@ async def test_execute_futures_simple_statement_empty(cassandra):
     cql = 'SELECT * FROM system_schema.types;'
     statement = SimpleStatement(cql, fetch_size=1)
 
-    # this tests show that there nothing found and no one records is executed
     async with cassandra.execute_futures(statement) as paginator:
         async for _ in paginator:
             assert False
@@ -157,6 +156,30 @@ async def test_execute_futures_break(cassandra):
     assert len(ret) == 1
 
     assert len(paginator._deque) == 0
+
+
+@pytest.mark.asyncio
+async def test_execute_futures_simple_statement_error(cassandra):
+    cql = 'SELECT 1;'
+    statement = SimpleStatement(cql, fetch_size=1)
+
+    with pytest.raises(SyntaxException):
+        async with cassandra.execute_futures(statement) as paginator:
+            async for _ in paginator:
+                assert False
+                _
+
+
+@pytest.mark.asyncio
+async def test_execute_futures_runtime_error(cassandra):
+    cql = 'SELECT * FROM system.size_estimates;'
+    statement = SimpleStatement(cql, fetch_size=100)
+
+    paginator = cassandra.execute_futures(statement)
+
+    with pytest.raises(RuntimeError):
+        async for _ in paginator:
+            _
 
 
 def test_malformed_session():

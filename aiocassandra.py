@@ -80,12 +80,20 @@ class _Paginator:
     def __aiter__(self):
         return self._paginator()
 
-    if not PY_352:
+    if not PY_352:  # pragma: no cover
         __aiter__ = asyncio.coroutine(__aiter__)
 
     @async_generator
     async def _paginator(self):
-        while self._deque or not self._finish_event.is_set():
+        if self.cassandra_fut is None:
+            raise RuntimeError(
+                'Pagination should be done inside async context manager')
+
+        while (
+            self._deque or
+            not self._finish_event.is_set() or
+            self._exc is not None
+        ):
             if self._exc is not None:
                 raise self._exc
 
