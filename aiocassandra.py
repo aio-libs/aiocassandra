@@ -16,10 +16,12 @@ PY_352 = sys.version_info >= (3, 5, 2)
 logger = logging.getLogger(__name__)
 
 
-class Paginator:
+class _Paginator:
 
-    def __init__(self, cassandra_fut, *, executor, loop):
-        self.cassandra_fut = cassandra_fut
+    def __init__(self, request, *, executor, loop):
+        self.cassandra_fut = None
+
+        self._request = request
 
         self._executor = executor
         self._loop = loop
@@ -29,11 +31,6 @@ class Paginator:
         self._drain_event = asyncio.Event(loop=loop)
         self._finish_event = asyncio.Event(loop=loop)
         self._exit_event = Event()
-
-        self.cassandra_fut.add_callbacks(
-            callback=self._handle_page,
-            errback=self._handle_err
-        )
 
     def _handle_page(self, rows):
         if self._exit_event.is_set():
@@ -62,6 +59,15 @@ class Paginator:
         self._loop.call_soon_threadsafe(self._finish_event.set)
 
     async def __aenter__(self):
+        self.cassandra_fut = await self._loop.run_in_executor(
+            self._executor,
+            self._request
+        )
+
+        self.cassandra_fut.add_callbacks(
+            callback=self._handle_page,
+            errback=self._handle_err
+        )
         return self
 
     async def __aexit__(self, *exc_info):
@@ -117,8 +123,12 @@ def _asyncio_exception(self, fut, exc):
     self._asyncio_loop.call_soon_threadsafe(fut.set_exception, exc)
 
 
-def execute_future(self, *args, **kwargs):
-    cassandra_fut = self.execute_async(*args, **kwargs)
+async def execute_future(self, *args, **kwargs):
+    _request = partial(self.execute_async, *args, **kwargs)
+    cassandra_fut = await self._asyncio_loop.run_in_executor(
+        self._asyncio_executor,
+        _request,
+    )
 
     asyncio_fut = self._asyncio_fut_factory()
 
@@ -127,13 +137,13 @@ def execute_future(self, *args, **kwargs):
         errback=partial(self._asyncio_exception, asyncio_fut)
     )
 
-    return asyncio_fut
+    return await asyncio_fut
 
 
 def execute_futures(self, *args, **kwargs):
-    cassandra_fut = self.execute_async(*args, **kwargs)
-    return Paginator(
-        cassandra_fut,
+    _request = partial(self.execute_async, *args, **kwargs)
+    return _Paginator(
+        _request,
         executor=self._asyncio_executor,
         loop=self._asyncio_loop,
     )
