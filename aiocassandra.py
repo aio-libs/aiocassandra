@@ -15,10 +15,16 @@ def _asyncio_fut_factory(loop):
 
 
 def _asyncio_result(self, fut, result):
+    if fut.cancelled():
+        return
+
     self._loop.call_soon_threadsafe(fut.set_result, result)
 
 
 def _asyncio_exception(self, fut, exc):
+    if fut.cancelled():
+        return
+
     self._loop.call_soon_threadsafe(fut.set_exception, exc)
 
 
