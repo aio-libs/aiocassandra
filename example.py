@@ -11,7 +11,7 @@ cluster = Cluster()
 session = cluster.connect()
 
 
-async def main(*, loop):
+async def main():
     # patches and adds `execute_future`, `execute_future` and `prepare_future`
     # to `cassandra.cluster.Session`
     aiosession(session)
@@ -37,6 +37,6 @@ async def main(*, loop):
 
 
 loop = asyncio.get_event_loop()
-loop.run_until_complete(main(loop=loop))
+loop.run_until_complete(main())
 cluster.shutdown()
 loop.close()
