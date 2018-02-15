@@ -48,7 +48,6 @@ class _Paginator:
         self._loop.call_soon_threadsafe(self._drain_event.set)
 
         if self.cassandra_fut.has_more_pages:
-            # not sure do we need to track these futures somehow
             _fn = self.cassandra_fut.start_fetching_next_page
             fut = self._loop.run_in_executor(self._executor, _fn)
             self.__pages.add(fut)
