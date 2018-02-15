@@ -33,6 +33,8 @@ class _Paginator:
         self._finish_event = asyncio.Event(loop=loop)
         self._exit_event = Event()
 
+        self.__pages = set()
+
     def _handle_page(self, rows):
         if self._exit_event.is_set():
             _len = len(rows)
@@ -46,8 +48,11 @@ class _Paginator:
         self._loop.call_soon_threadsafe(self._drain_event.set)
 
         if self.cassandra_fut.has_more_pages:
+            # not sure do we need to track these futures somehow
             _fn = self.cassandra_fut.start_fetching_next_page
-            self._loop.run_in_executor(self._executor, _fn)
+            fut = self._loop.run_in_executor(self._executor, _fn)
+            self.__pages.add(fut)
+            fut.add_done_callback(self.__pages.remove)
             return
 
         self._loop.call_soon_threadsafe(self._finish_event.set)
@@ -70,6 +75,8 @@ class _Paginator:
         return self
 
     async def __aexit__(self, *exc_info):
+        await asyncio.gather(*self.__pages, loop=self._loop)
+
         self._exit_event.set()
         _len = len(self._deque)
         self._deque.clear()
@@ -134,7 +141,7 @@ async def execute_future(self, *args, **kwargs):
     _request = partial(self.execute_async, *args, **kwargs)
     cassandra_fut = await self._asyncio_loop.run_in_executor(
         self._asyncio_executor,
-        _request,
+        _request
     )
 
     asyncio_fut = self._asyncio_fut_factory()
@@ -152,7 +159,7 @@ def execute_futures(self, *args, **kwargs):
     return _Paginator(
         _request,
         executor=self._asyncio_executor,
-        loop=self._asyncio_loop,
+        loop=self._asyncio_loop
     )
 
 
