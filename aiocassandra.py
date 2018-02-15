@@ -74,13 +74,13 @@ class _Paginator:
         return self
 
     async def __aexit__(self, *exc_info):
-        await asyncio.gather(*self.__pages, loop=self._loop)
-
         self._exit_event.set()
         _len = len(self._deque)
         self._deque.clear()
         logger.debug(
             'Paginator is closed, cleared in-memory %i records', _len)
+
+        await asyncio.gather(*self.__pages, loop=self._loop)
 
     def __aiter__(self):
         return self._paginator()
