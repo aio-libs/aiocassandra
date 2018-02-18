@@ -12,7 +12,7 @@ session = cluster.connect()
 
 
 async def main():
-    # patches and adds `execute_future`, `execute_future` and `prepare_future`
+    # patches and adds `execute_future`, `execute_futures` and `prepare_future`
     # to `cassandra.cluster.Session`
     aiosession(session)
 
