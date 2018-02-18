@@ -188,7 +188,7 @@ async def test_execute_futures_runtime_error(cassandra):
 
     with pytest.raises(RuntimeError):
         async for row in paginator:
-            ret.appen(row)
+            ret.append(row)
 
     assert len(ret) == 0
 
