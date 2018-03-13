@@ -55,7 +55,3 @@ jobs:
       on:
         tags: true
         all_branches: true
-
-notifications:
-  email:
-    on_success: never
