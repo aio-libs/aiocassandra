@@ -18,7 +18,7 @@ addons:
     - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
       key_url: *apache-key
     packages:
-    - oracle-java8-set-default
+    - oracle-java8-installer
     - cassandra
 services:
 - cassandra
