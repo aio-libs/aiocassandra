@@ -12,11 +12,8 @@ cache: pip
 addons:
   apt:
     sources:
-    - sourceline: 'ppa:webupd8team/java'
-    - sourceline: 'deb http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: &apache-key https://www.apache.org/dist/cassandra/KEYS
-    - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: *apache-key
+    - webupd8team-java
+    - cassandra
     packages:
     - oracle-java8-installer
     - cassandra
