@@ -13,10 +13,8 @@ addons:
   apt:
     sources:
     - webupd8team-java
-    - cassandra
     packages:
     - oracle-java8-installer
-    - cassandra
 services:
 - cassandra
 
