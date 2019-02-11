@@ -10,21 +10,15 @@ python:
 cache: pip
 
 before_install:
-  - sudo apt-get update && sudo apt-get install -y dpkg
-
-addons:
-  apt:
-    sources:
-    - sourceline: 'ppa:webupd8team/java'
-    - sourceline: 'deb http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: &apache-key https://www.apache.org/dist/cassandra/KEYS
-    - sourceline: 'deb-src http://www.apache.org/dist/cassandra/debian 311x main'
-      key_url: *apache-key
-    packages:
-    - oracle-java8-set-default
-    - cassandra
-services:
-- cassandra
+  - sudo apt-get update
+  - sudo apt-get install -y dpkg apt-transport-https software-properties-common curl
+  - sudo add-apt-repository ppa:webupd8team/java -y
+  - sudo apt-get update
+  - sudo apt-get install -y oracle-java8-set-default
+  - echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+  - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+  - sudo apt-get update
+  - sudo apt-get install -y cassandra
 
 install:
 - pip install tox
